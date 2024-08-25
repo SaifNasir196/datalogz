@@ -25,14 +25,14 @@ export default function Component() {
                     <div className="space-x-3">
 
                         <Link href="/">
-                            <Button variant="ghost" className={cn({ "bg-secondary/[0.25]": pathname == "/" })}>
+                            <Button variant="ghost" className={cn({ "bg-primary/[0.1]": pathname == "/" })}>
                                 Home
                             </Button>
                         </Link>
 
-                        <Link href="/">
-                            <Button variant="ghost" className={cn({ "bg-secondary/[0.25]": pathname.includes("/explore") })}>
-                                Add more links
+                        <Link href="/dashboard">
+                            <Button variant="ghost" className={cn({ "bg-primary/[0.1]": pathname.includes("/dashboard") })}>
+                                Dashboard
                             </Button>
                         </Link>
 

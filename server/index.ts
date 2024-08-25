@@ -13,10 +13,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Clerk authentication middleware
-const clerkAuth = ClerkExpressRequireAuth({
-  authorizedParties: ['https://datalogz-io.vercel.app', 'http://localhost:3000'],
-});
+// // Clerk authentication middleware
+// const clerkAuth = ClerkExpressRequireAuth({
+//   authorizedParties: ['https://datalogz-io.vercel.app', 'http://localhost:3000'],
+// });
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -25,15 +25,14 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 
-
 app.get('/api', (req: Request, res: Response) => {
     res.send('Hello World!');
 });
 
 // Protected route example
-app.get('/api/protected-data', clerkAuth, (req, res) => {
-  res.json({ message: 'This is protected data from the Express backend' });
-});
+// app.get('/api/protected-data', clerkAuth, (req, res) => {
+//   res.json({ message: 'This is protected data from the Express backend' });
+// });
 
 
 

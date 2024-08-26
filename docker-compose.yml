@@ -1,0 +1,37 @@
+services:
+  sonarqube-db:
+    image: ayeshadow/sonarqube-db:alpine
+    container_name: sonarqube-db
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    networks:
+      - my-network
+
+  sonarqube:
+    image: ayeshadow/sonarqube:latest
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    networks:
+      - my-network
+    depends_on:
+      - sonarqube-db
+
+  jenkins:
+    image: ayeshadow/jenkins-image:latest
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

@@ -35,6 +35,17 @@ export function useProjectMetrics(projectKey: string) {
     });
 }
 
+export function useMetrics(projectKey : string){
+  return useQuery({
+    queryKey: ['metrics', projectKey],
+    queryFn: async () => {
+        const res = await axios.get(`/api/metrics?projectKey=${projectKey}`)
+        return res.data
+    },
+    enabled:!!projectKey,
+  });
+}
+
 export function useLanguages(projectKey: string){
   return useQuery({
     queryKey: ['languages', projectKey],

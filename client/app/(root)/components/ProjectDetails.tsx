@@ -1,5 +1,5 @@
 import React from 'react'
-import { useProjectMetrics, useProjectIssues, useQualityGateStatus, useLanguages, useIssues } from '@/app/hooks/sonarqube'
+import { useProjectMetrics, useProjectIssues, useQualityGateStatus, useLanguages, useIssues, useMetrics } from '@/app/hooks/sonarqube'
 
 const ProjectDetails = ({ projectKey }: { projectKey: string }) => {
 
@@ -7,11 +7,12 @@ const ProjectDetails = ({ projectKey }: { projectKey: string }) => {
     const { data: issues } = useIssues(projectKey)
     const { data: qualityGate } = useQualityGateStatus(projectKey)
     const {data : languages} = useLanguages(projectKey)
-
+    const {data: metricsdata} = useMetrics(projectKey)
     console.log('metrics', metrics);
     console.log('issues', issues);
     console.log('qualityGate', qualityGate);
-    console.log('languages', languages)
+    console.log('languages', languages);
+    console.log('metric', metricsdata);
     console.log('error message', error);
 
     if (!metrics || !issues || !qualityGate) {

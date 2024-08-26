@@ -144,7 +144,7 @@ export default function Home() {
 
 
         {response === 'analyze' && (
-          <div className="space-y-5">
+          <div className="space-y-5 w-full">
             <p className="text-gray-500"> {status}</p>
 
             <RepoCard repo={data} />
@@ -161,9 +161,8 @@ export default function Home() {
 
         {response === 'fetch' && projectKey && (
           <div className="w-full">
-            {/* {JSON.stringify(data)} */}
-            <ProjectDetails projectKey={projectKey} />
             <RepoCard repo={data} />
+            <ProjectDetails projectKey={projectKey} />
             <Overview data={mockData} />
           </div>
         )}

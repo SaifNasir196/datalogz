@@ -5,18 +5,19 @@ const ProjectDetails = ({ projectKey }: { projectKey: string }) => {
 
     const { data: metrics, isLoading, error, isLoadingError } = useProjectMetrics(projectKey)
     const { data: issues } = useProjectIssues(projectKey)
-    // const { data: qualityGate } = useQualityGateStatus(projectKey)
+    const { data: qualityGate } = useQualityGateStatus(projectKey)
 
+    console.log('metrics', metrics);
     console.log('issues', issues);
-    console.log('error bool', isLoadingError);
+    console.log('qualityGate', qualityGate);
     console.log('error message', error);
 
-    if (!metrics) {
+    if (!metrics || !issues || !qualityGate) {
         return null
     }
 
     return (
-        <div className="mt-8">
+        <div className="my-12">
             <h2 className="text-2xl font-bold mb-4">Project Analysis Results</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -32,28 +33,28 @@ const ProjectDetails = ({ projectKey }: { projectKey: string }) => {
                     </ul>
                 </div>
 
-                {/* <div className="bg-white p-4 rounded shadow">
+                <div className="bg-white p-4 rounded shadow">
                     <h3 className="text-xl font-semibold mb-2">Quality Gate</h3>
-                    <p className={`font-bold ${qualityGate.projectStatus.status === 'OK' ? 'text-green-500' : 'text-red-500'}`}>
-                        Status: {qualityGate.projectStatus.status}
+                    <p className={`font-bold ${qualityGate?.projectStatus.status === 'OK' ? 'text-green-500' : 'text-red-500'}`}>
+                        Status: {qualityGate?.projectStatus.status}
                     </p>
-                </div> */}
+                </div>
             </div>
 
-            {/* <div className="mt-4 bg-white p-4 rounded shadow">
+            <div className="mt-4 bg-white p-4 rounded shadow">
                 <h3 className="text-xl font-semibold mb-2">Issues</h3>
                 <ul>
-                    {issues.issues.slice(0, 5).map((issue: any) => (
+                    {issues?.issues?.slice(0, 5).map((issue: any) => (
                         <li key={issue.key} className="mb-2">
                             <p className="font-medium">{issue.message}</p>
                             <p className="text-sm text-gray-600">Severity: {issue.severity}</p>
                         </li>
                     ))}
                 </ul>
-                {issues.issues.length > 5 && (
+                {issues?.issues?.length > 5 && (
                     <p className="text-sm text-gray-600">Showing 5 of {issues.issues.length} issues</p>
                 )}
-            </div> */}
+            </div>
         </div>
     )
 }

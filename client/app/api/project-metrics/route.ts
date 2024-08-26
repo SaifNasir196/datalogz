@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
 
-  const { projectKey, metricKeys  } = await request.json();
+  const { searchParams } = new URL(request.url);
+  const projectKey = searchParams.get('projectKey');
+  const metricKeys = searchParams.get('metricKeys') || 'bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density';
   const sonarqubeUrl = process.env.SONARQUBE_URL;
   const sonarqubeToken = process.env.SONARQUBE_TOKEN;
 

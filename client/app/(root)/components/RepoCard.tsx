@@ -10,8 +10,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from '@/components/ui/progress'
-
+import { useQualityGateStatus } from '@/app/hooks/sonarqube'
 import { FileIcon, FileTextIcon } from 'lucide-react'
 
 const data = {
@@ -65,8 +64,11 @@ const data = {
 
 
 const RepoCard = ({ repo }: { repo: any }) => {
+    const date = repo.components[0]?.lastAnalysisDate;
+    const lastAnalysisDate = date ? new Date(date) : null;
+
     return (
-        <div className='my-10'>
+        <div className='my-10 w-full'>
             <h3 className="text-2xl font-semibold mb-4">Overview</h3>
 
             <Card className="w-full max-w-3xl">
@@ -76,11 +78,12 @@ const RepoCard = ({ repo }: { repo: any }) => {
                     </div>
                     <div>
                         <CardTitle className="text-xl font-bold flex items-center">
-                            {repo.components[0].name}
+                            {repo.components[0]?.name}
                         </CardTitle>
                         <CardDescription className="text-sm text-muted-foreground">
-                            <FileIcon className="inline mr-1" size={14} />
                             {/* {data.description} */}
+                            {/* {repo} */}
+                            {lastAnalysisDate?.toDateString()}
                         </CardDescription>
                     </div>
                 </CardHeader>

@@ -28,34 +28,44 @@ export function useProjectMetrics(projectKey: string) {
   return useQuery({
     queryKey: ['projectMetrics', projectKey],
     queryFn: async () => {
-
-        const res = await fetch(`/api/project-metrics`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ projectKey, metricKeys: metricsToFetch }),
-        })
-        return res.json()
+        const res = await axios.get(`/api/project-metrics?projectKey=${projectKey}&metricKeys=${metricsToFetch}`)
+        return res.data
     },
     enabled: !!projectKey,
     });
 }
 
 
-export function useProjectIssues(projectKey: string) {
-  return useQuery({
-    queryKey: ['projectIssues', projectKey],
-    queryFn: () => axios.get(`/project-issues?projectKey=${projectKey}`)
-      .then(response => response.data),
+export function useIssues(projectKey: string) {
+    return useQuery({
+    queryKey: ['issues', projectKey],
+    queryFn: async () => {
+        const res = await axios.get(`/api/issues?projectKey=${projectKey}`)
+        return res.data
+    },
     enabled: !!projectKey,
   });
 }
 
+export function useProjectIssues(projectKey: string) {
+  return useQuery({
+    queryKey: ['projectIssues', projectKey],
+    queryFn: async () => {
+        const res = await axios.get(`/api/project-issues?projectKey=${projectKey}`)
+        return res.data
+    },
+    enabled: !!projectKey,
+  });
+}
 
 export function useQualityGateStatus(projectKey: string) {
   return useQuery({
     queryKey: ['qualityGateStatus', projectKey],
-    queryFn: () => axios.get(`/api/qualitygates/project_status?projectKey=${projectKey}`)
-      .then(response => response.data),
+    queryFn: async () => {
+        const res = await axios.get(`/api/quality-gate-status?projectKey=${projectKey}`)
+        return res.data
+    },
     enabled: !!projectKey,
   });
 }
+

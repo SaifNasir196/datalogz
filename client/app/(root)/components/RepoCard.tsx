@@ -1,6 +1,5 @@
-
 "use client"
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Card,
     CardContent,
@@ -11,7 +10,12 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useQualityGateStatus } from '@/app/hooks/sonarqube'
-import { FileIcon, FileTextIcon } from 'lucide-react'
+import { FileIcon, FileTextIcon, Heart } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { addProjectKey, findProjectKey, removeProjectKey } from '@/app/actions/user'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import HeartIcon from '@/components/Heart'
+import { useUser } from '@clerk/nextjs'
 
 const data = {
     title: 'react-hook-form',
@@ -64,39 +68,89 @@ const data = {
 
 
 const RepoCard = ({ repo }: { repo: any }) => {
-    const date = repo.components[0]?.lastAnalysisDate;
+    const [repoKey, setRepoKey] = useState<string | null>(null);
+    const date = repo.lastAnalysisDate;
     const lastAnalysisDate = date ? new Date(date) : null;
+    const queryClient = useQueryClient();
+    const user = useUser();
+
+    useEffect(() => {
+        setRepoKey(repo.key);
+    }, [repo.key])
+
+    console.log('repo', repo.key);
+
+    const { data: isFav } = useQuery({
+        queryKey: ['favourite', repo.key],
+        queryFn: async () => {
+            if (!repo.key && !repoKey) return { found: false, key: null };
+            const res = await findProjectKey(repoKey || repo.key);
+            return res;
+        },
+        enabled: !!repo.key
+    })
+
+    const { mutate: addFav, isPending: isAddingPending } = useMutation({
+        mutationFn: async () => {
+            if (!repo.key) return null;
+            const res = await addProjectKey(repo.key);
+            return res;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['favourite'] });
+        },
+
+    })
+
+    const { mutate: removeFav, isPending: isRemovingPending } = useMutation({
+        mutationFn: async () => {
+            if (!repo.key) return null;
+            const res = await removeProjectKey(repo.key);
+            return res;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['favourite'] });
+        }
+    })
 
     return (
         <div className='my-10 w-full'>
             <h3 className="text-2xl font-semibold mb-4">Overview</h3>
 
-            <Card className="w-full max-w-3xl">
-                <CardHeader className="flex flex-row items-center space-x-4 pb-2">
+            <Card className="w-full max-w-3xl flex items-center justify-between">
+                <CardHeader className="flex flex-row items-center gap-4 pb-7 pl-7 flex-1">
+
                     <div className="w-10 h-10 bg-primary rounded-md flex items-center justify-center">
                         <FileTextIcon className="text-primary-foreground" size={24} />
                     </div>
                     <div>
+
                         <CardTitle className="text-xl font-bold flex items-center">
-                            {repo.components[0]?.name}
+                            {repo.name}
                         </CardTitle>
                         <CardDescription className="text-sm text-muted-foreground">
-                            {/* {data.description} */}
-                            {/* {repo} */}
-                            {lastAnalysisDate?.toDateString()}
+                            Last analyzed: {lastAnalysisDate?.toDateString()}
                         </CardDescription>
                     </div>
+
                 </CardHeader>
 
-                <CardContent>
-                    {/* <div className="flex flex-wrap gap-2">
-                        {data.tags.map((tag: string) => (
-                            <Badge className='bg-gray-400' key={tag}>{tag}</Badge>
-                        ))}
-                    </div>
-                    <div className="mt-4 flex items-center justify-end space-x-4 text-sm text-muted-foreground">
-                        <span>Licence: {data.license}</span>
-                    </div> */}
+                <CardContent className='flex items-center justify-center h-full'>
+                    {/* favoutire */}
+                    {user.isSignedIn
+                        ? (isFav && isFav.found
+                            ? <HeartIcon
+                                filled
+                                onClick={() => removeFav()}
+                                disabled={isRemovingPending}
+                            />
+                            : <HeartIcon
+                                onClick={() => addFav()}
+                                disabled={isAddingPending}
+                            />
+                        ) : (null)
+                    }
+
                 </CardContent>
             </Card>
         </div>

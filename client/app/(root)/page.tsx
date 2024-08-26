@@ -93,8 +93,8 @@ export default function Home() {
     },
 
     onSuccess: (data) => {
-      setData(data.data)
-      console.log('data: ', data.data.components);
+      setData(data.data.components[0])
+      // console.log('data: ', data.data.components[0]);
       if (data.data.components.length >= 1) {
         setResponse('fetch');
         setStatus('Project exists. Fetching analysis results...');

@@ -2,13 +2,13 @@
 import { Input } from "@/components/ui/input";
 import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import RepoCard from "./components/RepoCard";
 import Overview from "./components/Overview";
 import { validateGitUrl } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import LoadingItem from "@/components/LoadingItem";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProjectDetails from "./components/ProjectDetails";
+import { Badge } from "@/components/ui/badge";
+import Statistics from "./components/Statistics";
 
 const mockData = {
   title: 'react-hook-form',
@@ -59,14 +59,40 @@ const mockData = {
   }
 };
 
-
+const languageNames = [
+  'AzureResourceManager',
+  'C#',
+  'CSS',
+  'CloudFormation',
+  'Docker',
+  'Flex',
+  'Go',
+  'HTML',
+  'JSON',
+  'JSP',
+  'Java',
+  'JavaScript',
+  'Kotlin',
+  'Kubernetes',
+  'PHP',
+  'Python',
+  'Ruby',
+  'Scala',
+  'Secrets',
+  'Terraform',
+  'Text',
+  'TypeScript',
+  'VB.NET',
+  'XML',
+  'YAML'
+];
 
 export default function Home() {
   const repoRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState('');
   const [response, setResponse] = useState<"fetch" | "analyze" | "fetched" | null>(null);
   const [data, setData] = useState({});
-  const [projectKey, setProjectKey] = useState<string>('')
+  const [projectKey, setProjectKey] = useState<string>('');
 
   const { mutate: checkProject, isPending, isError, error } = useMutation({
     mutationFn: async () => {
@@ -78,10 +104,8 @@ export default function Home() {
 
       const projectKey = gitUrl.split('/').pop()?.replace('.git', '') || '';
       setProjectKey(projectKey);
-      const response = await fetch('/api/check-sonarqube-project', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectKey }),
+      const response = await fetch(`/api/check-sonarqube-project?projectKey=${projectKey}`, {
+        method: 'GET',
       });
 
       if (!response.ok) {
@@ -93,9 +117,9 @@ export default function Home() {
     },
 
     onSuccess: (data) => {
-      setData(data.data.components[0])
-      // console.log('data: ', data.data.components[0]);
-      if (data.data.components.length >= 1) {
+      setData(data.data)
+
+      if (data.data != null) {
         setResponse('fetch');
         setStatus('Project exists. Fetching analysis results...');
         // Logic to fetch and display analysis results
@@ -135,16 +159,18 @@ export default function Home() {
 
 
 
+
+
   return (
-    <main className="container w-full flex min-h-screen flex-col items-center p-24">
-      <div className="flex flex-col items-center space-y-4 justify-center">
+    <main className="container w-full flex min-h-screen flex-col items-center py-24">
+      <div className="flex flex-col items-center space-y-4 justify-center max-w-[41.65rem]">
         <h1 className="text-4xl font-bold">Open Source Project <span className="text-primary">Analytics</span>  with <span className="text-primary">AI</span></h1>
         <p className=" text-center  text-gray-400">
           Paste the link to any open source GitHub repository to view its analytics dashboard
         </p>
 
 
-        <div className="flex mt-2 focus:ring-none w-full h-full">
+        <div className="flex mt-2 focus:ring-none w-full h-full items-start justify-center">
           <div className="flex flex-col w-full h-full relative">
 
             <Input
@@ -163,12 +189,27 @@ export default function Home() {
         </div>
 
 
+        {!response && (
+          <div className="space-y-5  pt-20 max-w-[41.65rem] w-full">
+            <h2 className="text-lg font-semibold text-center">Supported languages</h2>
+            <div className="flex flex-row gap-2 flex-wrap justify-center md:px-10  ">
+              {languageNames.map((lang) => (
+                <Badge key={lang} className="px-3 rounded-sm py-2 bg-primary">
+                  {lang}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+
+
 
         {response === 'analyze' && (
           <div className="space-y-5 w-full">
             <p className="text-gray-500"> {status}</p>
 
-            <RepoCard repo={data} />
+            <Overview repo={data} />
 
             <Skeleton className="w-full h-44" />
             <div className="flex gap-5">
@@ -182,15 +223,11 @@ export default function Home() {
 
         {response === 'fetch' && projectKey && (
           <div className="w-full">
-            <RepoCard repo={data} />
+            <Overview repo={data} />
             <ProjectDetails projectKey={projectKey} />
-            <Overview data={mockData} />
+            <Statistics projectKey={projectKey} />
           </div>
         )}
-
-
-
-
 
       </div>
     </main>

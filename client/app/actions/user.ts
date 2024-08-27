@@ -77,6 +77,8 @@ export async function getAllProjectKeys() {
     throw new Error('Unauthorized');
   }
 
+  console.log('running');
+
   try {
     const user = await prisma.user.findUnique({
       where: { clerkId: userId },
@@ -119,7 +121,7 @@ export async function findProjectKey(key: string) {
 
     return foundKey ? { found: true, key: foundKey } : { found: false, key: null };
   } catch (error) {
-    console.error('Failed to find project key:', error);
+    // console.error('Failed to find project key:', error);
     // throw new Error();
   }
 }

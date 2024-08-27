@@ -4,13 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 
 
 
-export function useProjectExists(projectKey: string) {
+export function useExists(projectKey: string) {
   return useQuery({
     queryKey: ['projectExists', projectKey],
     queryFn: async () => {
       try {
-        const res = await axios.get(`/api/projects/search?projects=${projectKey}`);
-        return res.data.components.length > 0;
+        const res = await axios.get(`/api/check-sonarqube-project?projectKey=${projectKey}`);
+        return {success: res.data.components.length > 0, repo: res.data};
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           return false;
@@ -23,13 +23,12 @@ export function useProjectExists(projectKey: string) {
 }
 
 
-export function useProjectMetrics(projectKey: string) {
-  const metricsToFetch = 'bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density';
+export function useMeasures(projectKey: string, metricKeys="bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density") {
   return useQuery({
     queryKey: ['projectMetrics', projectKey],
     queryFn: async () => {
-        const res = await axios.get(`/api/project-metrics?projectKey=${projectKey}&metricKeys=${metricsToFetch}`)
-        return res.data
+        const res = await axios.get(`/api/measures?projectKey=${projectKey}&metricKeys=${metricKeys}`)
+        return res.data.data.component.measures
     },
     enabled: !!projectKey,
     });
@@ -51,6 +50,19 @@ export function useLanguages(projectKey: string){
     queryKey: ['languages', projectKey],
     queryFn: async () => {
         const res = await axios.get(`/api/languages?projectKey=${projectKey}`)
+        return res.data.languages
+    },
+    enabled:!!projectKey,
+  });
+}
+
+export function usePullRequests(projectKey: string){
+  return useQuery({
+    queryKey: ['pull-requests', projectKey],
+    queryFn: async () => {
+        const res = await axios.get(`/api/pull-requests?projectKey=${projectKey}`)
+        console.log('res', res);
+        // projectKey=${projectKey}
         return res.data
     },
     enabled:!!projectKey,

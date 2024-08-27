@@ -113,6 +113,27 @@ export default function Home() {
   });
 
 
+  const handleSubmit = async () => {
+    const repoUrl = repoRef.current?.value;
+    console.log(repoUrl)
+    checkProject();
+    const response = await fetch('/api/trigger-workflow', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ repoUrl }),
+    });
+    
+    const result = await response.json();
+    if (response.ok) {
+      alert('Workflow triggered successfully!');
+    } else {
+      alert(`Error: ${result.error}`);
+    }
+  };
+
+
 
   return (
     <main className="container w-full flex min-h-screen flex-col items-center p-24">
@@ -138,7 +159,7 @@ export default function Home() {
             </div>}
             {isError && <p className="text-red-500 text-sm ml-3">{error.message}</p>}
           </div>
-          <Button onClick={() => checkProject()} className="rounded-bl-none rounded-tl-none px-8">Analyze</Button>
+          <Button onClick={() => handleSubmit()} className="rounded-bl-none rounded-tl-none px-8">Analyze</Button>
         </div>
 
 

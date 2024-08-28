@@ -1,0 +1,51 @@
+services:
+  jenkins:
+    image: jenkins/jenkins
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+    networks:
+      - my-network
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+  # sonarqube-db:
+  #   image: postgres:alpine
+  #   container_name: sonarqube-db
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #   networks:     
+  #     - my-network
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+  sonarqube:
+    image: sonarqube
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL: ${SONAR_JDBC_URL}
+      SONAR_JDBC_USERNAME: ${SONAR_JDBC_USERNAME}
+      SONAR_JDBC_PASSWORD: ${SONAR_JDBC_PASSWORD}
+    networks:
+      - my-network
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_temp:/opt/sonarqube/temp
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  jenkins_home:
+  # postgres_data: # Uncomment if using the local PostgreSQL container
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonarqube_temp:
